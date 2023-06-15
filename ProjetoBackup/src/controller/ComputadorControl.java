@@ -44,6 +44,7 @@ public class ComputadorControl {
 		pc.setDescricao(descricao.get());
 		pc.setCliente(cliente);
 		computadorDAO.adicionar(pc);
+		computadores.add(pc);
 	}
 	
 	public void pesquisar() throws SQLException {
@@ -60,8 +61,24 @@ public class ComputadorControl {
 		}
 	}
 	
-	public void print() {
-		System.out.println(clienteProperty.get().getId());
+	public void excluir(Computador c) throws SQLException {
+		computadorDAO.deletar(c.getId());
+	}
+	
+	public void atualizar() throws SQLException {
+		Computador pc = new Computador();
+		pc.setCliente(clienteProperty.get());
+		pc.setDescricao(descricao.get());
+		pc.setId(id.get());
+		pc.setIP(Ip.get());
+		computadorDAO.atualizar(pc);
+	}
+	
+	public void setCampos(Computador c) {
+		id.set(c.getId());
+		descricao.set(c.getDescricao());
+		Ip.set(c.getIP());
+		clienteProperty.set(c.getCliente());
 	}
 	
 	
@@ -78,6 +95,10 @@ public class ComputadorControl {
 		return id;
 	}
 
+	public StringProperty getIp() {
+		return Ip;
+	}
+	
 	public void setClienteProperty(ObjectProperty<Cliente> clienteProperty) {
 		this.clienteProperty = clienteProperty;
 	}

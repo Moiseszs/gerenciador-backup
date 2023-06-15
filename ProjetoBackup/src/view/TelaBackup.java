@@ -151,7 +151,8 @@ public class TelaBackup implements Tela{
 		FlowPane flowPane = new FlowPane();
 		flowPane.setHgap(20);
 		gridPane.add(flowPane, 0, 10);
-		
+		bPane.getStyleClass().add("pane");
+		bPane.getStylesheets().add(getClass().getResource("style/backupStyle.css").toExternalForm());
 		flowPane.getChildren().addAll(btnSalvar, btnPesquisar);
 		setBind();
 		setComboBox();

@@ -47,15 +47,21 @@ public class ClienteDAOImpl implements DAO<Cliente>{
 	@Override
 	public Cliente pesquisarPorNome(String texto) throws SQLException {
 		Cliente cliente = new Cliente();
-		String sql = "SELECT * FROM cliente WHERE nome LIKE ?";
+		String sql = "SELECT cliente.id, cliente.nome, data_nasc, plano.nome "
+				+ "FROM cliente, plano, assinatura WHERE assinatura.cliente_id = cliente.id "
+				+ "AND assinatura.plano_id = plano.id AND"
+				+ " cliente.nome LIKE ?";
 		PreparedStatement statement = connection.prepareStatement(sql);
 		String novoTexto = "%" + texto + "%";
 		statement.setString(1, novoTexto);
 		ResultSet set = statement.executeQuery();
 		while(set.next()) {
-			cliente.setId(set.getLong("id"));
-			cliente.setNome(set.getString("nome"));
-			cliente.setDataNascimento(set.getDate("data_nascimento").
+			Plano plano = new Plano();
+			plano.setNome(set.getString("plano.nome"));
+			cliente.setPlano(plano);
+			cliente.setId(set.getLong("cliente.id"));
+			cliente.setNome(set.getString("cliente.nome"));
+			cliente.setDataNascimento(set.getDate("data_nasc").
 					toLocalDate());
 		}
 		return cliente;
@@ -86,15 +92,11 @@ public class ClienteDAOImpl implements DAO<Cliente>{
 		return clientes;
 	}
 	
-	public int getQtdeComputadoresPorCliente(Cliente cliente) {
-		return 0;
+	@Override
+	public void atualizar(Cliente t) throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	public int getLimiteDoPlano(Cliente cliente) {
-		String sql = "SELECT plano.limite FROM plano, assinatura, cliente\r\n"
-				+ "WHERE plano.id = assinatura.plano_id \r\n"
-				+ "AND cliente.id = assinatura.cliente_id\r\n"
-				+ "AND cliente.id = ?";
-		return 0;
-	}
+	
 }

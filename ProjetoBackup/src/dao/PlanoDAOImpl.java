@@ -32,6 +32,13 @@ public class PlanoDAOImpl implements DAO<Plano> {
 		
 	}
 	@Override
+	public void atualizar(Plano t) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	@Override
 	public Plano pesquisarPorNome(String texto) throws SQLException {
 		Plano plano = new Plano();
 		String sql = "SELECT * FROM plano WHERE nome = ?";

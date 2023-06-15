@@ -32,12 +32,14 @@ public class Cliente {
 	
 	public void setPlano(Plano plano) {
 		this.plano = plano;
+		this.planoNome = plano.getNome();
 	}
 	public Plano getPlano() {
 		return plano;
 	}
 	
+	
 	public String getPlanoNome() {
-		return plano.getNome();
+		return planoNome;
 	}
 }

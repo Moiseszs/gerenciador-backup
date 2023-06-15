@@ -88,4 +88,9 @@ public class BackupDAOImpl implements DAO<Backup>{
 		return backups;
 	}
 	
+	@Override
+	public void atualizar(Backup t) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
 }

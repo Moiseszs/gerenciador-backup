@@ -31,6 +31,8 @@ import javafx.scene.control.Button;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableObjectValue;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ListChangeListener.Change;
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -118,6 +120,8 @@ public class TelaCliente implements Tela{
 	public void setTabela() {
 		TableColumn<Cliente, Long> colId = new TableColumn<>("ID");
 		colId.setCellValueFactory(new PropertyValueFactory<Cliente, Long>("id"));
+		TableColumn<Cliente, String> colNome = new TableColumn<Cliente, String>("Nome");
+		colNome.setCellValueFactory(new PropertyValueFactory<Cliente, String>("nome"));
 		TableColumn<Cliente, String> colPlano = new TableColumn<Cliente, String>("Plano");
 		colPlano.setCellValueFactory(new PropertyValueFactory<Cliente, String>("PlanoNome"));
 		TableColumn<Cliente, Void> colExcluir = new TableColumn<>("Ações");
@@ -137,7 +141,8 @@ public class TelaCliente implements Tela{
 					btn.setOnAction(e ->{
 						Cliente cliente = getTableView().getItems().get(getIndex());
 						try {
-							control.excluir();
+							control.excluir(cliente);
+							tabela.refresh();
 						} catch (Exception e2) {
 							Alert alert = new Alert(AlertType.WARNING, 
 									"Exclua primeiro as dependecias");
@@ -163,10 +168,19 @@ public class TelaCliente implements Tela{
 		}};
 		colExcluir.setCellFactory(acoes);
 		
-		tabela.getColumns().addAll(colId, colPlano, colExcluir);
+		tabela.getColumns().addAll(colId, colNome, colPlano, colExcluir);
 		tabela.setItems(control.getClientes());
 		
-		
+		tabela.getSelectionModel().getSelectedItems().addListener(
+				new ListChangeListener<Cliente>() {
+					@Override
+					public void onChanged(Change<? extends Cliente> c) {
+						if(!c.getList().isEmpty()) {
+							control.setCampos(c.getList().get(0));
+						}
+						
+					}
+				});
 		
 	}
 	
@@ -225,9 +239,18 @@ public class TelaCliente implements Tela{
 		gridPane.add(flowPane, 0, 10);
 		flowPane.getChildren().addAll(btnSalvar, btnPesquisar);
 		borderPane.getStyleClass().add("pane");
-		borderPane.getStylesheets().add(getClass().getResource("ClienteStyle.css").toExternalForm());
+		borderPane.getStylesheets().add(getClass().getResource("style/ClienteStyle.css").toExternalForm());
 		btnSalvar.setOnAction((e) -> {
 			adicionar();
+		});
+		
+		btnPesquisar.setOnAction(e ->{
+			try {
+				control.pesquisar();
+			} catch (SQLException e1) {
+				
+				e1.printStackTrace();
+			}
 		});
 		
 		isEmpty();

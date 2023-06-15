@@ -32,7 +32,10 @@ public class AssinaturaDAOImpl implements DAO<Assinatura> {
 	}
 	@Override
 	public void deletar(long id) throws SQLException {
-		// TODO Auto-generated method stub
+		String sql = "DELETE FROM assinatura WHERE cliente_id = ?";
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setLong(1, id);
+		statement.executeUpdate();
 		
 	}
 	@Override
@@ -44,5 +47,11 @@ public class AssinaturaDAOImpl implements DAO<Assinatura> {
 	public List<Assinatura> pesquisarTodos() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public void atualizar(Assinatura t) throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 }

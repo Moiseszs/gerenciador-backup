@@ -9,15 +9,19 @@ import entity.Cliente;
 import entity.Computador;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.css.converter.StringConverter;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -64,7 +68,7 @@ public class TelaComputador implements Tela{
 	public void ligaCampos() {
 		Bindings.bindBidirectional(txtDescricacao.textProperty(), control.getDescricao());
 		Bindings.bindBidirectional(comboClientes.valueProperty(), control.getCliente());
-		
+		Bindings.bindBidirectional(txtIP.textProperty(), control.getIp());
 		Bindings.bindBidirectional(txtId.textProperty(), control.getId(), new javafx.util.StringConverter<Number>() {
 			@Override
 			public String toString(Number object) {
@@ -83,10 +87,73 @@ public class TelaComputador implements Tela{
 		colId.setCellValueFactory(new PropertyValueFactory<Computador, Long>("id"));
 		TableColumn<Computador, String> colNome = new TableColumn<Computador, String>("Descição");
 		colNome.setCellValueFactory(new PropertyValueFactory<Computador, String>("descricao"));
-		TableColumn<Computador, String> colCliente = new TableColumn<Computador, String>("cliente");
+		TableColumn<Computador, String> colCliente = new TableColumn<Computador, String>("Cliente");
 		colCliente.setCellValueFactory(new PropertyValueFactory<Computador, String>("clienteNome"));
-		tabela.getColumns().addAll(colId, colNome, colCliente);
+		
+		TableColumn<Computador, String> colIP = new TableColumn<Computador, String>("IP");
+		colIP.setCellValueFactory(new PropertyValueFactory<Computador, String>("IP"));
+		TableColumn<Computador, Void> colExcluir = new TableColumn<>("Ações");
+		
+		Callback<TableColumn<Computador, Void>, TableCell<Computador, Void>> 
+		acoes = new Callback<>() {
+
+		@Override
+		public TableCell<Computador, Void> call(TableColumn<Computador, Void> param) {
+			final TableCell<Computador, Void> cell = new TableCell<>() {
+				final Button btn = new Button("Excluir");
+				
+				{
+					btn.setMaxSize(100, 2);
+					btn.setOnAction(e ->{
+						Computador pc = getTableView().getItems().get(getIndex());
+						try {
+							control.excluir(pc);
+							tabela.refresh();
+						} catch (Exception e2) {
+							Alert alert = new Alert(AlertType.WARNING, 
+									"Exclua primeiro as dependecias");
+							alert.showAndWait();
+							//e2.printStackTrace();						
+							}
+					});
+				}
+				@Override
+			protected void updateItem(Void item, boolean empty) {
+					super.updateItem(item, empty);
+					if(empty) {
+						setGraphic(null);
+					}
+					else {
+						setGraphic(btn);
+					}
+				};
+			};
+			
+			
+			return cell;
+		}};
+		colExcluir.setCellFactory(acoes);
+		
+		
+		
+		
+		tabela.getColumns().addAll(colId, colNome, colCliente, colIP, colExcluir);
+		
+		tabela.getSelectionModel().getSelectedItems().addListener(
+				new ListChangeListener<Computador>() {
+					@Override
+					public void onChanged(Change<? extends Computador> c) {
+						if(!c.getList().isEmpty()) {
+							control.setCampos(c.getList().get(0));
+						}
+						
+					}
+				});
+		
 		tabela.setItems(control.getComputadores());
+		
+		
+		
 	}
 	
 	public void salvar() {
@@ -151,17 +218,19 @@ public class TelaComputador implements Tela{
 		gridPane.add(txtId, 0, 1);
 		txtId.setEditable(false);
 		gridPane.add(lblDescricao, 0, 2);
-		gridPane.add(lblNomeCliente, 0, 4);
+		gridPane.add(lblNomeCliente, 10, 2);
+		gridPane.add(lblIP, 10, 0);
 		gridPane.add(txtDescricacao, 0, 3);
-		gridPane.add(comboClientes, 0, 5);
-		gridPane.add(txtIP, 0, 6);
+		gridPane.add(comboClientes, 10, 3);
+		gridPane.add(txtIP, 10, 1);
 		FlowPane flowPane = new FlowPane();
 		flowPane.setHgap(20);
-		flowPane.getChildren().addAll(btnSalvar, btnAtualizar, 
-				btnDeletar, btnPesquisar);
+		flowPane.getChildren().addAll(btnSalvar, btnAtualizar,  btnPesquisar);
 		gridPane.add(flowPane, 0, 10);
-		borderPane.getStyleClass().add("pane");
+		
 		preparaComboBox();
+		borderPane.getStyleClass().add("pane");
+		borderPane.getStylesheets().add(getClass().getResource("style/compStyle.css").toExternalForm());
 		btnAtualizar.setOnAction((e) ->{
 			try {
 				control.pesquisar();
@@ -175,6 +244,13 @@ public class TelaComputador implements Tela{
 				control.adicionar();
 			} catch (Exception e1) {
 				e1.printStackTrace();
+			}
+		});
+		btnAtualizar.setOnAction(e ->{
+			try {
+				control.atualizar();
+			} catch (Exception e2) {
+				// TODO: handle exception
 			}
 		});
 	}

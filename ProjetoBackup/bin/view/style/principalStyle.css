@@ -1,0 +1,21 @@
+.tab-pane {
+	-fx-background-color: white; 
+}
+
+.tab-header-background{
+    -fx-background-color: #fcfcfc;
+    -fx-opacity: 0.9;
+}
+
+.menu-bar {
+    -fx-background-color: #fcfcfc;
+   	-fx-border-color: #e1e1e1;
+}
+
+.tab:disabled {
+	-fx-background-color: blue;
+}
+
+.tab:selected{
+	-fx-background-color: #f4f4f4;
+}

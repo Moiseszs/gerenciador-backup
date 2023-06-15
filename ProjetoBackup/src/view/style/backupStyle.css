@@ -1,0 +1,46 @@
+.pane{
+	-fx-background-color: white;
+}
+
+.button{
+	-fx-background-color: white;
+	-fx-border-color: gray;
+	-fx-font-weight: bold;
+	-fx-padding: 10px 20px 10px;
+	-fx-border-radius: 5%;
+}
+
+.combo-box{
+	-fx-background-color: white;
+	-fx-border-color: #b0b0b0;
+	-fx-border-radius: 5px;
+}
+
+.label{
+	-fx-text-fill: #747474;
+}
+
+.text-field{
+	-fx-border-color: #868686;
+	-fx-background-color: -fx-text-box-border, -fx-control-inner-background;
+	-fx-border-radius: 1%; 
+}
+
+.table-cell{
+	-fx-border-color: transparent;
+}
+
+
+.button:hover{
+	-fx-border-color: #3399ff;
+	-fx-background-color: #f9f9f9;
+}
+
+.table-view .button{
+	-fx-padding: 1 1 1;
+	-fx-background-color: #f7f7f7;
+}
+
+.date-picker >  *{
+	-fx-background-color: white;
+}

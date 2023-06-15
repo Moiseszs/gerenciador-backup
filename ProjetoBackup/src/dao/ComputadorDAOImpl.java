@@ -24,7 +24,7 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 	public Computador adicionar(Computador computador) throws SQLException {
 		String sql = "INSERT INTO computador(descricao, cliente_id) VALUES (?,?)";
 		PreparedStatement statement = 
-				connection.prepareStatement(sql);
+				connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 		statement.setString(1, 
 				computador.getDescricao());
 		statement.setLong(2, 
@@ -32,7 +32,7 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 		statement.executeUpdate();
 		ResultSet set = statement.getGeneratedKeys();
 		if(set.next()) {
-			computador.setId(set.getLong("id"));
+			computador.setId(set.getLong(1));
 		}
 		return computador;
 	}
@@ -40,7 +40,10 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 	
 	@Override
 	public void deletar(long id) throws SQLException {
-		// TODO Auto-generated method stub
+		String sql = "DELETE FROM computador WHERE id = ?";
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setLong(1, id);
+		statement.executeUpdate();
 	}
 	@Override
 	public Computador pesquisarPorNome(String texto) throws SQLException {
@@ -79,5 +82,15 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 			
 		}
 		return pcs;
+	}
+	
+	@Override
+	public void atualizar(Computador c) throws SQLException {
+		String sql = "UPDATE computador SET descricao = ?, ip = ? WHERE id = ?";
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, c.getDescricao());
+		statement.setString(2, c.getIP());
+		statement.setLong(3, c.getId());
+		statement.executeUpdate();
 	}
 }

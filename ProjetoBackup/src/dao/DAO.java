@@ -12,4 +12,6 @@ public interface DAO <T> {
 	public T pesquisarPorNome(String texto) throws SQLException;
 	
 	public List<T> pesquisarTodos() throws SQLException;
+	
+	public void atualizar(T t) throws SQLException;
 }

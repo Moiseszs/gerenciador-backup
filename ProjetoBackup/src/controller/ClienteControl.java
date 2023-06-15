@@ -9,6 +9,7 @@ import dao.ClienteDAOImpl;
 import dao.PlanoDAOImpl;
 import entity.Assinatura;
 import entity.Cliente;
+import entity.Computador;
 import entity.Plano;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
@@ -21,7 +22,7 @@ import javafx.collections.ObservableList;
 
 public class ClienteControl {
 
-	private LongProperty id = new SimpleLongProperty(6);
+	private LongProperty id = new SimpleLongProperty();
 	private StringProperty nome = new SimpleStringProperty("");
 	private ObjectProperty<LocalDate> dataNascimento =
 			new SimpleObjectProperty<>();
@@ -74,9 +75,24 @@ public class ClienteControl {
 		}
 	}
 	
+	public void pesquisar() throws SQLException {
+		Cliente cliente = clienteDAO.pesquisarPorNome(nome.get());
+		setCampos(cliente);
+	}
+	
+	
+	public void setCampos(Cliente c) {
+		id.set(c.getId());
+		nome.set(c.getNome());
+		planoProp.set(c.getPlano());
+		dataNascimento.set(c.getDataNascimento());
+	}
+	
 
-	public void excluir() throws SQLException {
-		clienteDAO.deletar(id.get());
+	public void excluir(Cliente c) throws SQLException {
+		assinaturaDAO.deletar(c.getId());
+		clienteDAO.deletar(c.getId());
+		clientes.remove(c);
 	}
 	
 	public LongProperty getId() {

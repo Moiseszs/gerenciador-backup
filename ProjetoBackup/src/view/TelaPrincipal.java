@@ -60,7 +60,7 @@ public class TelaPrincipal extends Application implements Executor{
 		bPane.setCenter(tab);
 
 			
-		bPane.getStylesheets().add(getClass().getResource("principalStyle.css").toExternalForm());
+		bPane.getStylesheets().add(getClass().getResource("style/principalStyle.css").toExternalForm());
 		
 		Scene scene = new Scene(bPane, 800, 600);
 		stage.setScene(scene);
@@ -88,16 +88,22 @@ public class TelaPrincipal extends Application implements Executor{
 	@Override
 	public void executar(String cmd) {
 		if("Cliente".equals(cmd)) {
+			if(!tab.getTabs().contains(tabCliente)) {
 			tabCliente.setContent(getTela("Cliente").render());
 			tab.getTabs().add(tabCliente);
+			}
 		}
 		else if("Computador".equals(cmd)) {
+			if(!tab.getTabs().contains(tabComputador)) {
 			tabComputador.setContent(getTela("Computador").render());
 			tab.getTabs().add(tabComputador);
+			}
 		}
 		else if("Backup".equals(cmd)) {
+			if(!tab.getTabs().contains(tabBackup)) {
 			tabBackup.setContent(getTela("Backup").render());
 			tab.getTabs().add(tabBackup);
+			}
 		}
 	}
 	
