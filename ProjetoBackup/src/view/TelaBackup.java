@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import controller.BackupControl;
 import controller.ComputadorControl;
 import entity.Backup;
+import entity.Cliente;
 import entity.Computador;
 import entity.Plano;
 import javafx.application.Application;
@@ -15,16 +16,19 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.LongStringConverter;
 
@@ -60,6 +64,14 @@ public class TelaBackup implements Tela{
 	
 	@Override
 	public Pane render() {
+		try {
+			computadorControl.pesquisarTodos();
+			backupControl.pesquisarTodos();
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
 		return bPane;
 	}
 	
@@ -107,8 +119,58 @@ public class TelaBackup implements Tela{
 	
 	
 	public void setTabela() {
-		TableColumn<Backup, Long> colID = new TableColumn<Backup, Long>();
-		TableColumn<Backup, String> colDesc = new TableColumn<Backup, String>();
+		TableColumn<Backup, Long> colID = new TableColumn<Backup, Long>("ID");
+		TableColumn<Backup, String> colDesc = new TableColumn<Backup, String>("Descricao");
+		TableColumn<Backup, String> colCompDesc = new TableColumn<Backup, String>("Computador");
+		
+		colID.setCellValueFactory(new PropertyValueFactory<Backup, Long>("id"));
+		colDesc.setCellValueFactory(new PropertyValueFactory<Backup, String>("descricao"));
+		colCompDesc.setCellValueFactory(new PropertyValueFactory<Backup, String>("compDesc"));
+		
+		tabela.setItems(backupControl.getBackups());
+		
+		TableColumn<Backup, Void> colExcluir = new TableColumn<>("Ações");
+		
+		Callback<TableColumn<Backup, Void>, TableCell<Backup, Void>> 
+		acoes = new Callback<>() {
+
+		@Override
+		public TableCell<Backup, Void> call(TableColumn<Backup, Void> param) {
+			final TableCell<Backup, Void> cell = new TableCell<>() {
+				final Button btn = new Button("Excluir");
+				
+				{
+					btn.setMaxSize(100, 2);
+					btn.setOnAction(e ->{
+						Backup b = getTableView().getItems().get(getIndex());
+						try {
+							backupControl.excluir(b);
+							tabela.refresh();
+						} catch (Exception e2) {
+							Alert alert = new Alert(AlertType.WARNING, 
+									"Exclua primeiro as dependecias");
+							alert.showAndWait();
+							//e2.printStackTrace();						
+							}
+					});
+				}
+				@Override
+			protected void updateItem(Void item, boolean empty) {
+					super.updateItem(item, empty);
+					if(empty) {
+						setGraphic(null);
+					}
+					else {
+						setGraphic(btn);
+					}
+				};
+			};
+			
+			
+			return cell;
+		}};
+		colExcluir.setCellFactory(acoes);
+		tabela.getColumns().addAll(colID, colDesc, colCompDesc, colExcluir);
 	}
 	
 	@Override
@@ -116,7 +178,7 @@ public class TelaBackup implements Tela{
 		try {
 			backupControl = new BackupControl();
 			computadorControl = new ComputadorControl();
-			computadorControl.pesquisarTodos();
+			
 		} 
 		catch (Exception e) {
 			Alert alert = new Alert(AlertType.ERROR, 
@@ -156,6 +218,7 @@ public class TelaBackup implements Tela{
 		flowPane.getChildren().addAll(btnSalvar, btnPesquisar);
 		setBind();
 		setComboBox();
+		setTabela();
 	}
 
 	

@@ -54,6 +54,12 @@ public class TelaComputador implements Tela{
 	
 	@Override
 	public Pane render() {
+		try {
+			control.pesquisarTodos();
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
 		return borderPane;
 	}
 
@@ -197,8 +203,8 @@ public class TelaComputador implements Tela{
 		try {
 			control = new ComputadorControl();
 			clienteControl = new ClienteControl();
-			clienteControl.pesquisarTodos();
-			control.pesquisarTodos();
+			//clienteControl.pesquisarTodos();
+			//control.pesquisarTodos();
 		}
 		catch (Exception e) {
 			System.out.println("erro");
@@ -250,7 +256,7 @@ public class TelaComputador implements Tela{
 			try {
 				control.atualizar();
 			} catch (Exception e2) {
-				// TODO: handle exception
+				
 			}
 		});
 	}

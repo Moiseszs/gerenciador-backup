@@ -10,7 +10,8 @@ public class Backup {
 	private LocalDate dataInicio;
 	private LocalDate dataFim;
 	private String descricao;
-
+	private String compDesc;
+	
 	public long getId() {
 		return id;
 	}
@@ -51,5 +52,8 @@ public class Backup {
 		this.descricao = descricao;
 	}
 
+	public String getCompDesc() {
+		return computador.getDescricao();
+	}
 	
 }

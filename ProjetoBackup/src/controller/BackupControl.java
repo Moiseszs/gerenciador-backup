@@ -54,10 +54,16 @@ public class BackupControl {
 	
 	public void pesquisarTodos() throws SQLException {
 		List<Backup> lista = backupDAO.pesquisarTodos();
+		backups.clear();
 		for(Backup backup : lista) {
 			backups.add(backup);
 		}
 	}
+	
+	public void excluir(Backup b) {
+		
+	}
+	
 
 	public LongProperty getId() {
 		return id;
@@ -79,6 +85,8 @@ public class BackupControl {
 		return computadorProp;
 	}
 	
-	
+	public ObservableList<Backup> getBackups() {
+		return backups;
+	}
 	
 }

@@ -52,7 +52,7 @@ public class BackupDAOImpl implements DAO<Backup>{
 		String sql = "SELECT back_up.id, back_up.data_inicio, back_up.data_fim,\r\n"
 				+ "back_up.descricacao, computador.descricao\r\n"
 				+ "FROM back_up, computador\r\n"
-				+ "WHERE back_up.pc_id = computador.cliente_id\r\n"
+				+ "WHERE back_up.computador_id = computador.id\r\n"
 				+ "AND back_up.descricacao = ?";
 		String Novotexto = "%" + texto + "%";
 		PreparedStatement statement = connection
@@ -71,7 +71,10 @@ public class BackupDAOImpl implements DAO<Backup>{
 	@Override
 	public List<Backup> pesquisarTodos() throws SQLException {
 		List<Backup> backups = new ArrayList<>();
-		String sql = "SELECT * FROM back_up";
+		String sql = "SELECT back_up.id, back_up.data_inicio, back_up.data_fim,\r\n"
+				+ "back_up.descricao, computador.descricao\r\n"
+				+ "FROM back_up, computador\r\n"
+				+ "WHERE back_up.computador_id = computador.id\r\n";
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet set = statement.executeQuery();
 		while(set.next()) {
@@ -81,7 +84,7 @@ public class BackupDAOImpl implements DAO<Backup>{
 			backup.setDescricao(set.getString("descricao"));
 			backup.setDataInicio(set.getDate("data_inicio").toLocalDate());
 			backup.setDataFim(set.getDate("data_fim").toLocalDate());
-			computador.setId(set.getLong("computador_id"));
+			computador.setDescricao(set.getString("computador.descricao"));
 			backup.setComputador(computador);
 			backups.add(backup);
 		}
@@ -90,7 +93,7 @@ public class BackupDAOImpl implements DAO<Backup>{
 	
 	@Override
 	public void atualizar(Backup t) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 }

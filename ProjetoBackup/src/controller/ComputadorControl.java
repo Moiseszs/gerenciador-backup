@@ -42,9 +42,10 @@ public class ComputadorControl {
 		Cliente cliente = clienteProperty.get();
 		Computador pc = new Computador();
 		pc.setDescricao(descricao.get());
+		pc.setIP(Ip.get());
 		pc.setCliente(cliente);
 		computadorDAO.adicionar(pc);
-		computadores.add(pc);
+		pesquisarTodos();
 	}
 	
 	public void pesquisar() throws SQLException {
@@ -56,13 +57,18 @@ public class ComputadorControl {
 	
 	public void pesquisarTodos() throws SQLException {
 		List<Computador> pcs = computadorDAO.pesquisarTodos();
+		computadores.clear();
 		for(Computador pc : pcs) {
-			computadores.add(pc);
+				computadores.add(pc);
 		}
+		
+		
 	}
 	
 	public void excluir(Computador c) throws SQLException {
 		computadorDAO.deletar(c.getId());
+		computadores.clear();
+		pesquisarTodos();
 	}
 	
 	public void atualizar() throws SQLException {
@@ -72,6 +78,8 @@ public class ComputadorControl {
 		pc.setId(id.get());
 		pc.setIP(Ip.get());
 		computadorDAO.atualizar(pc);
+		computadores.clear();
+		pesquisarTodos();
 	}
 	
 	public void setCampos(Computador c) {

@@ -33,11 +33,13 @@ public class ClienteControl {
 	ClienteDAOImpl clienteDAO;
 	PlanoDAOImpl planoDAO;
 	AssinaturaDAOImpl assinaturaDAO;
+	ComputadorControl pcControl;
 	
 	public ClienteControl() throws ClassNotFoundException, SQLException {
 		clienteDAO = new ClienteDAOImpl();
 		planoDAO = new PlanoDAOImpl();
 		assinaturaDAO = new AssinaturaDAOImpl();
+		pcControl = new ComputadorControl();
 	}
 	
 	public void addTeste() {
@@ -57,8 +59,8 @@ public class ClienteControl {
 		cliente.setNome(nome.get());
 		cliente.setDataNascimento(dataNascimento.get());
 		cliente = clienteDAO.adicionar(cliente);
-		clientes.add(cliente);
 		salvarAssinatura(cliente, plano);
+		pesquisarTodos();
 	}
 	
 	public void salvarAssinatura(Cliente cliente, Plano plano) throws SQLException {
@@ -89,10 +91,27 @@ public class ClienteControl {
 	}
 	
 
-	public void excluir(Cliente c) throws SQLException {
-		assinaturaDAO.deletar(c.getId());
-		clienteDAO.deletar(c.getId());
-		clientes.remove(c);
+	public void excluir(Cliente c) throws Exception {
+		
+		Computador pc = new Computador();
+		if(pc.getCliente().equals(c)) {
+			throw new Exception("Nao foi possivel deletar Cliente");
+		}
+		else {
+			clienteDAO.deletar(c.getId());
+			assinaturaDAO.deletar(c.getId());
+		}
+		
+	}
+	
+	
+	public void atualizar() throws SQLException {
+		Cliente c = new Cliente();
+		c.setId(id.get());
+		c.setDataNascimento(dataNascimento.get());
+		c.setNome(nome.get());
+		clienteDAO.atualizar(c);
+		pesquisarTodos();
 	}
 	
 	public LongProperty getId() {

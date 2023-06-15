@@ -61,8 +61,22 @@
 	-fx-background-color: white;
 }
 
-DatePicker >  *{
+.date-picker .arrow-button{
 	-fx-background-color: white;
+}
+
+.date-picker-popup .month-year-pane .label{
+	-fx-background-color: transparent;
+}
+
+.date-picker-popup .spinner .button{
+	 -fx-background-color: transparent;
+	 -fx-border-color: transparent;
+	 -fx-padding: 10 10 10;
+}
+
+.date-picker-popup .month-year-pane{
+	-fx-background-color: #f8f8f8;
 }
 
 .table-view{

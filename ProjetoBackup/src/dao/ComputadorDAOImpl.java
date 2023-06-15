@@ -22,13 +22,14 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 	
 	@Override
 	public Computador adicionar(Computador computador) throws SQLException {
-		String sql = "INSERT INTO computador(descricao, cliente_id) VALUES (?,?)";
+		String sql = "INSERT INTO computador(descricao, cliente_id, ip) VALUES (?,?,?)";
 		PreparedStatement statement = 
 				connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 		statement.setString(1, 
 				computador.getDescricao());
 		statement.setLong(2, 
 				computador.getCliente().getId());
+		statement.setString(3, computador.getIP());
 		statement.executeUpdate();
 		ResultSet set = statement.getGeneratedKeys();
 		if(set.next()) {
@@ -67,7 +68,7 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 	@Override
 	public List<Computador> pesquisarTodos() throws SQLException {
 		List<Computador> pcs = new ArrayList();
-		String sql = "SELECT computador.id, descricao, nome AS cliente FROM computador, cliente\r\n"
+		String sql = "SELECT computador.id, descricao, ip, nome AS cliente FROM computador, cliente\r\n"
 				+ "WHERE computador.cliente_id = cliente.id";
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet set = statement.executeQuery();
@@ -77,6 +78,7 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 			computador.setId(set.getLong("id"));
 			computador.setDescricao(set.getString("descricao"));
 			cliente.setNome(set.getString("cliente"));
+			computador.setIP(set.getString("ip"));
 			computador.setCliente(cliente);
 			pcs.add(computador);
 			

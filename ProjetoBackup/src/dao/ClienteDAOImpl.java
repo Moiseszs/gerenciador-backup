@@ -93,8 +93,13 @@ public class ClienteDAOImpl implements DAO<Cliente>{
 	}
 	
 	@Override
-	public void atualizar(Cliente t) throws SQLException {
-		// TODO Auto-generated method stub
+	public void atualizar(Cliente c) throws SQLException {
+		String sql = "UPDATE cliente SET nome = ?, data_nasc = ? WHERE id = ?";
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, c.getNome());
+		statement.setDate(2, Date.valueOf(c.getDataNascimento()));
+		statement.setLong(3, c.getId());
+		statement.executeUpdate();
 		
 	}
 	
