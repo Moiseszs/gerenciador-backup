@@ -15,7 +15,7 @@ public class AssinaturaDAOImpl implements DAO<Assinatura> {
 	private Connection connection;
 	
 	public AssinaturaDAOImpl() throws ClassNotFoundException, SQLException {
-		connection = DatabaseConnector.connectMSSQL();
+		connection = DatabaseConnector.connectMYSQL();
 	}
 	
 	@Override
@@ -26,7 +26,7 @@ public class AssinaturaDAOImpl implements DAO<Assinatura> {
 		statement.setLong(1, assinatura.getCliente().getId());
 		statement.setLong(2, assinatura.getPlano().getId());
 		statement.executeUpdate();
-		ResultSet set = statement.getGeneratedKeys();
+		//ResultSet set = statement.getGeneratedKeys();
 		
 		return assinatura;
 	}

@@ -8,6 +8,8 @@ public class Cliente {
 	private long id;
 	private String nome;
 	private LocalDate dataNascimento;
+	private Plano plano;
+	private String planoNome;
 	
 	public long getId() {
 		return id;
@@ -28,5 +30,14 @@ public class Cliente {
 		this.dataNascimento = dataNascimento;
 	}
 	
+	public void setPlano(Plano plano) {
+		this.plano = plano;
+	}
+	public Plano getPlano() {
+		return plano;
+	}
 	
+	public String getPlanoNome() {
+		return plano.getNome();
+	}
 }

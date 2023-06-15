@@ -21,10 +21,10 @@ import javafx.collections.ObservableList;
 
 public class ClienteControl {
 
-	private LongProperty id = new SimpleLongProperty(0);
+	private LongProperty id = new SimpleLongProperty(6);
 	private StringProperty nome = new SimpleStringProperty("");
 	private ObjectProperty<LocalDate> dataNascimento =
-			new SimpleObjectProperty<>(LocalDate.now());
+			new SimpleObjectProperty<>();
 	private ObjectProperty<Plano> planoProp = new SimpleObjectProperty<Plano>();
 	private ObservableList<Cliente> clientes = 
 			FXCollections.observableArrayList();
@@ -54,7 +54,7 @@ public class ClienteControl {
 		Cliente cliente = new Cliente();
 		Plano plano = planoProp.get();
 		cliente.setNome(nome.get());
-		cliente.setDataNascimento(LocalDate.now());
+		cliente.setDataNascimento(dataNascimento.get());
 		cliente = clienteDAO.adicionar(cliente);
 		clientes.add(cliente);
 		salvarAssinatura(cliente, plano);
@@ -75,6 +75,10 @@ public class ClienteControl {
 	}
 	
 
+	public void excluir() throws SQLException {
+		clienteDAO.deletar(id.get());
+	}
+	
 	public LongProperty getId() {
 		return id;
 	}

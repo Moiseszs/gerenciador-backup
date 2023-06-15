@@ -8,7 +8,9 @@ import java.time.format.DateTimeFormatter;
 import controller.ClienteControl;
 import controller.ComputadorControl;
 import controller.PlanoControl;
+import entity.Backup;
 import entity.Cliente;
+import entity.Computador;
 import entity.Plano;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -18,37 +20,42 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableObjectValue;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.DateStringConverter;
 import javafx.util.converter.LocalDateStringConverter;
+import javafx.util.converter.LongStringConverter;
 import net.sourceforge.jtds.jdbc.DateTime;
 
-public class TelaCliente extends Application {
+public class TelaCliente implements Tela{
 
 	private TextField txtNome = new TextField();
-	//private TextField txtDataNasc = new TextField();
 	private TextField txtId = new TextField();
 	private Label lblId = new Label("ID");
 	private Label lblNome = new Label("Nome");
 	private Label lblDataNasc = new Label("Data de Nascimento");
 	private DatePicker dataNascPicker = new DatePicker();
+	private Pane pane = new Pane();
 	private Label lblPlano = new Label("Plano");
 	private ComboBox<Plano> comboPlano = new ComboBox<>();
-	private Pane pane = new Pane();
 	private ClienteControl control;
 	private PlanoControl planoControl;
 	private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -57,17 +64,30 @@ public class TelaCliente extends Application {
 	private Button btnSalvar = new Button("Salvar");
 	private Button btnPesquisar = new Button("Pesquisar");
 	private Button btnAtualizar = new Button("Atualizar");
+	private BorderPane borderPane = new BorderPane();
+	private Executor executor;
 	
-	public void ligaCampos() {
+	public TelaCliente(Executor executor) {
+		this.executor = executor;
+	}
+	
+	public TelaCliente() {
+		
+	}
+	
+	public void setBind() {
+		Bindings.bindBidirectional(txtId.textProperty(), control.getId(),
+				(StringConverter) new LongStringConverter());
 		Bindings.bindBidirectional(txtNome.textProperty(), 
 				control.getNome());
 		Bindings.bindBidirectional(dataNascPicker.valueProperty(), 
 				control.getDataNascimento());
 		Bindings.bindBidirectional(comboPlano.valueProperty(), 
 				control.getPlano());
+		
 	}
 	
-	public void preparaComboBox() {
+	public void setComboBox() {
 		
 		comboPlano.setItems(planoControl.getPlanos());
 		comboPlano.setPromptText("Selecione um plano");
@@ -89,6 +109,67 @@ public class TelaCliente extends Application {
 		});
 	}
 	
+	@Override
+	public Pane render() {
+		return borderPane;
+	}
+	
+	
+	public void setTabela() {
+		TableColumn<Cliente, Long> colId = new TableColumn<>("ID");
+		colId.setCellValueFactory(new PropertyValueFactory<Cliente, Long>("id"));
+		TableColumn<Cliente, String> colPlano = new TableColumn<Cliente, String>("Plano");
+		colPlano.setCellValueFactory(new PropertyValueFactory<Cliente, String>("PlanoNome"));
+		TableColumn<Cliente, Void> colExcluir = new TableColumn<>("Ações");
+		
+		tabela.setPrefWidth(10);
+		
+		Callback<TableColumn<Cliente, Void>, TableCell<Cliente, Void>> 
+		acoes = new Callback<>() {
+
+		@Override
+		public TableCell<Cliente, Void> call(TableColumn<Cliente, Void> param) {
+			final TableCell<Cliente, Void> cell = new TableCell<>() {
+				final Button btn = new Button("Excluir");
+				
+				{
+					btn.setMaxSize(100, 2);
+					btn.setOnAction(e ->{
+						Cliente cliente = getTableView().getItems().get(getIndex());
+						try {
+							control.excluir();
+						} catch (Exception e2) {
+							Alert alert = new Alert(AlertType.WARNING, 
+									"Exclua primeiro as dependecias");
+							alert.showAndWait();
+							//e2.printStackTrace();						
+							}
+					});
+				}
+				@Override
+			protected void updateItem(Void item, boolean empty) {
+					super.updateItem(item, empty);
+					if(empty) {
+						setGraphic(null);
+					}
+					else {
+						setGraphic(btn);
+					}
+				};
+			};
+			
+			
+			return cell;
+		}};
+		colExcluir.setCellFactory(acoes);
+		
+		tabela.getColumns().addAll(colId, colPlano, colExcluir);
+		tabela.setItems(control.getClientes());
+		
+		
+		
+	}
+	
 	public void adicionar() {
 		try {
 			control.salvar();
@@ -99,18 +180,20 @@ public class TelaCliente extends Application {
 	}
 	
 	
-	public void isFiled() {
+	public void isEmpty() {
 		BooleanBinding isTxtNomeEmpty = control.getNome().isEmpty(); 
 		BooleanBinding isPlanoNull = control.getPlano().isNull();
 		btnSalvar.disableProperty().bind(isPlanoNull.or(isTxtNomeEmpty));
 	}
+
 	
 	@Override
-	public void start(Stage stage) throws Exception {
+	public void start() {
 		try {
 			control = new ClienteControl();
 			planoControl = new PlanoControl();
 			planoControl.pesquisarTodos();
+			control.pesquisarTodos();
 		}
 		catch(SQLException | ClassNotFoundException e) {
 			Alert alert = new Alert(AlertType.ERROR, 
@@ -118,10 +201,10 @@ public class TelaCliente extends Application {
 			alert.showAndWait();
 			System.exit(1);
 		}
-		Scene sc = new Scene(pane);
-		BorderPane borderPane = new BorderPane();
+		
+		
+		Scene sc = new Scene(borderPane);
 		borderPane.setPadding(new Insets(15));
-		Scene scene = new Scene(borderPane);
 		GridPane gridPane = new GridPane();
 		borderPane.setTop(gridPane);
 		borderPane.setBottom(tabela);
@@ -138,22 +221,20 @@ public class TelaCliente extends Application {
 		gridPane.add(comboPlano, 10, 4);
 		txtId.setEditable(false);
 		FlowPane flowPane = new FlowPane();
+		flowPane.setHgap(20);
 		gridPane.add(flowPane, 0, 10);
 		flowPane.getChildren().addAll(btnSalvar, btnPesquisar);
+		borderPane.getStyleClass().add("pane");
+		borderPane.getStylesheets().add(getClass().getResource("ClienteStyle.css").toExternalForm());
 		btnSalvar.setOnAction((e) -> {
 			adicionar();
 		});
-		stage.setScene(scene);
-		stage.setWidth(1024);
-		stage.setHeight(600);
-		stage.setTitle("Cadastro de Cliente");
-		isFiled();
-		ligaCampos();
-		preparaComboBox();
-		stage.show();
+		
+		isEmpty();
+		setBind();
+		setComboBox();
+		setTabela();
+
 	}
-	
-	public static void main(String[] args) {
-		launch(args);
-	}
+
 }

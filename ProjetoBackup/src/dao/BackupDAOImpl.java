@@ -18,12 +18,12 @@ public class BackupDAOImpl implements DAO<Backup>{
 	private Connection connection;
 	
 	public BackupDAOImpl() throws ClassNotFoundException, SQLException {
-		connection = DatabaseConnector.connectMSSQL();
+		connection = DatabaseConnector.connectMYSQL();
 	}
 	
 	@Override
 	public Backup adicionar(Backup backup) throws SQLException {
-		String sql = "INSERT INTO backup(pc_id, data_inicio, data_fim, descricao) "
+		String sql = "INSERT INTO back_up(computador_id, data_inicio, data_fim, descricao) "
 				+ "VALUES (?,?,?,?)";
 		PreparedStatement statement = connection.prepareStatement(sql, 
 				PreparedStatement.RETURN_GENERATED_KEYS);
@@ -34,7 +34,7 @@ public class BackupDAOImpl implements DAO<Backup>{
 		statement.executeUpdate();
 		ResultSet set = statement.getGeneratedKeys();
 		if(set.next()) {
-			backup.setId(set.getLong("id"));
+			backup.setId(set.getLong(1));
 		}
 		return backup;
 	}
@@ -70,9 +70,22 @@ public class BackupDAOImpl implements DAO<Backup>{
 	}
 	@Override
 	public List<Backup> pesquisarTodos() throws SQLException {
-		List<Cliente> clientes = new ArrayList<>();
-		String sql = "SELECT * FROM cliente";
-		return null;
+		List<Backup> backups = new ArrayList<>();
+		String sql = "SELECT * FROM back_up";
+		PreparedStatement statement = connection.prepareStatement(sql);
+		ResultSet set = statement.executeQuery();
+		while(set.next()) {
+			Backup backup = new Backup();
+			Computador computador = new Computador();
+			backup.setId(set.getLong("id"));
+			backup.setDescricao(set.getString("descricao"));
+			backup.setDataInicio(set.getDate("data_inicio").toLocalDate());
+			backup.setDataFim(set.getDate("data_fim").toLocalDate());
+			computador.setId(set.getLong("computador_id"));
+			backup.setComputador(computador);
+			backups.add(backup);
+		}
+		return backups;
 	}
 	
 }

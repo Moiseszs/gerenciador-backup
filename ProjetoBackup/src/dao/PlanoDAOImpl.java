@@ -17,7 +17,7 @@ public class PlanoDAOImpl implements DAO<Plano> {
 	
 	public PlanoDAOImpl() throws ClassNotFoundException, SQLException {
 		connection = 
-				DatabaseConnector.connectMSSQL();
+				DatabaseConnector.connectMYSQL();
 	}
 	
 	@Override

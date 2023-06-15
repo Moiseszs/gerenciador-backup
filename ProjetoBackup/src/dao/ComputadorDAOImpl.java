@@ -17,7 +17,7 @@ public class ComputadorDAOImpl implements DAO<Computador> {
 	private Connection connection; 
 	
 	public ComputadorDAOImpl() throws ClassNotFoundException, SQLException {
-		connection = DatabaseConnector.connectMSSQL();
+		connection = DatabaseConnector.connectMYSQL();
 	}
 	
 	@Override

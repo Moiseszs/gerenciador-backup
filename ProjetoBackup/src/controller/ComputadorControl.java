@@ -26,7 +26,7 @@ public class ComputadorControl {
 	private LongProperty id = new SimpleLongProperty();
 	private StringProperty descricao = new SimpleStringProperty("");
 	private ObjectProperty<Cliente> clienteProperty = new SimpleObjectProperty<>();
-	private StringProperty clienteNome = new SimpleStringProperty("");
+	private StringProperty Ip = new SimpleStringProperty("");
 	
 	private ObservableList<Computador> computadores =
 			FXCollections.observableArrayList();
@@ -40,24 +40,17 @@ public class ComputadorControl {
 	
 	public void adicionar() throws Exception{
 		Cliente cliente = clienteProperty.get();
-		int limitePlano = clienteDAO.getLimiteDoPlano(cliente);
-		int qtdeComputadores = clienteDAO.getQtdeComputadoresPorCliente(cliente);
-		if(limitePlano <= qtdeComputadores) {
-			Computador pc = new Computador();
-			pc.setDescricao(descricao.get());
-			pc.setCliente(cliente);
-			computadorDAO.adicionar(pc);
-			}
-		else {
-			throw new Exception("Limite excedido");
-		}
-		
+		Computador pc = new Computador();
+		pc.setDescricao(descricao.get());
+		pc.setCliente(cliente);
+		computadorDAO.adicionar(pc);
 	}
 	
 	public void pesquisar() throws SQLException {
 		Computador computador = computadorDAO.pesquisarPorNome(descricao.get());
 		clienteProperty.set(computador.getCliente());
 		id.set(computador.getId());
+		descricao.set(computador.getDescricao());
 	}
 	
 	public void pesquisarTodos() throws SQLException {

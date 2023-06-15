@@ -11,18 +11,19 @@ import java.util.List;
 
 import db.DatabaseConnector;
 import entity.Cliente;
+import entity.Plano;
 
 public class ClienteDAOImpl implements DAO<Cliente>{
 
 	private static Connection connection;
 	
 	public ClienteDAOImpl() throws ClassNotFoundException, SQLException {
-		connection = DatabaseConnector.connectMSSQL();
+		connection = DatabaseConnector.connectMYSQL();
 	}
 	
 	@Override
 	public Cliente adicionar(Cliente cliente) throws SQLException {
-		String sql = "INSERT INTO cliente(nome, data_nascimento) VALUES (?,?)";
+		String sql = "INSERT INTO cliente(nome, data_nasc) VALUES (?,?)";
 		PreparedStatement statement = 
 				connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 		statement.setString(1, cliente.getNome());
@@ -30,7 +31,7 @@ public class ClienteDAOImpl implements DAO<Cliente>{
 		statement.executeUpdate();
 		ResultSet result = statement.getGeneratedKeys();
 		if(result.next()) {
-			cliente.setId(result.getLong("id"));
+			cliente.setId(result.getLong(1));
 		}
 		return cliente;
 	}
@@ -63,15 +64,22 @@ public class ClienteDAOImpl implements DAO<Cliente>{
 	@Override
 	public List<Cliente> pesquisarTodos() throws SQLException {
 		List<Cliente> clientes = new ArrayList<>();
-		String sql = "SELECT * FROM cliente";
+		String sql = "SELECT cliente.id, cliente.nome, cliente.data_nasc,\r\n"
+				+ "plano.nome\r\n"
+				+ "FROM cliente, assinatura, plano\r\n"
+				+ "WHERE cliente.id = assinatura.cliente_id\r\n"
+				+ "AND plano.id = assinatura.plano_id";
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet set = statement.executeQuery();
 		while(set.next()) {
 			Cliente cliente = new Cliente();
+			Plano plano = new Plano();
 			cliente.setId(set.getLong("id"));
-			cliente.setDataNascimento(set.getDate("data_nascimento").
+			cliente.setDataNascimento(set.getDate("data_nasc").
 					toLocalDate());
 			cliente.setNome(set.getString("nome"));
+			plano.setNome(set.getString("plano.nome"));
+			cliente.setPlano(plano);
 			clientes.add(cliente);
 			
 		}

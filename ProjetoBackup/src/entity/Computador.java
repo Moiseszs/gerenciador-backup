@@ -6,6 +6,7 @@ public class Computador {
 	private String descricao;
 	private Cliente cliente;
 	private String clienteNome;
+	private String IP;
 	
 	public long getId() {
 		return id;
@@ -31,5 +32,12 @@ public class Computador {
 	}
 	public String getClienteNome() {
 		return cliente.getNome();
+	}
+	
+	public void setIP(String iP) {
+		this.IP = iP;
+	}
+	public String getIP() {
+		return IP;
 	}
 }
